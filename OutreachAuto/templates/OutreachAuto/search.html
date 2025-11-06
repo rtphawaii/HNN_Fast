@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>OutreachAuto</title>
+  <style>
+    :root{
+      --bg:#f6f7fb; --card:#ffffff; --text:#1a1a1a; --muted:#6b7280;
+      --ring:rgba(0,0,0,.08); --shadow:0 10px 30px rgba(0,0,0,.08);
+      --radius:16px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: var(--text); background: var(--bg);
+    }
+
+    /* Layout states */
+    body:not(.has-results) .stage {
+      min-height: 100vh; display: grid; place-items: center;
+      padding: 24px;
+    }
+    body.has-results .stage {
+      padding: 16px clamp(16px, 4vw, 48px) 80px;
+    }
+
+    /* Search bar wrapper */
+    .search-wrap {
+      width: min(840px, 92vw);
+      transition: all .25s ease;
+      margin-inline: auto;
+      position: relative;
+    }
+    body.has-results .search-wrap {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(246,247,251,.75);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      padding: 12px 0 16px;
+      border-bottom: 1px solid rgba(0,0,0,.06);
+    }
+
+    /* Search box */
+    .search-card {
+      background: var(--card); border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--ring);
+      padding: 12px;
+    }
+    form.search {
+      display: grid; grid-template-columns: 1fr auto;
+      gap: 10px; align-items: center;
+    }
+    input[type="text"]{
+      width: 100%; font-size: 16px; padding: 14px 16px;
+      border: 1px solid #d1d5db; border-radius: 12px;
+      outline: none; transition: border-color .15s ease, box-shadow .15s ease;
+      background: #fafafa;
+    }
+    input[type="text"]:focus{
+      border-color: #9aa2b1;
+      box-shadow: 0 0 0 4px rgba(100,116,139,.15);
+      background: #fff;
+    }
+    button[type="submit"]{
+      padding: 12px 18px; font-weight: 600; font-size: 15px;
+      border: 0; border-radius: 12px; cursor: pointer;
+      background: #111827; color: white;
+    }
+    .hint { color: var(--muted); font-size: 14px; padding: 8px 4px 0; }
+
+    /* Results card */
+    .results {
+      width: min(980px, 92vw);
+      margin: 22px auto 0;
+      background: var(--card);
+      border: 1px solid var(--ring);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px 20px;
+      animation: floatIn .25s ease both;
+    }
+    @keyframes floatIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .result-title { font-weight: 700; margin: 0 0 8px; font-size: 18px; }
+    .result-sub { margin: 0 0 12px; color: var(--muted); }
+    .pill {
+      display: inline-block; padding: 6px 10px; margin: 6px 6px 0 0;
+      border: 1px solid #e5e7eb; border-radius: 999px; font-size: 14px;
+      background: #fafafa;
+    }
+    .error { color: #b91c1c; font-weight: 600; }
+
+    .results-list {
+    display: grid;
+    gap: 14px;              /* ← spacing between results */
+    margin-top: 12px;
+    }
+
+    .result-item {
+    background: #fff;
+    border: 1px solid var(--ring);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    padding: 14px 16px;
+    }
+
+    .item-title {
+    margin: 0 0 6px;
+    font-weight: 700;
+    font-size: 16px;
+    }
+
+    .item-title a {
+    text-decoration: none;
+    color: inherit;
+    }
+
+    .item-title a:hover {
+    text-decoration: underline;
+    }
+
+    .item-sub {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.35;
+    }
+
+  </style>
+</head>
+<body class="{% if results or error %}has-results{% endif %}">
+  <div class="stage">
+    <div class="search-wrap">
+      <div class="search-card">
+        <form class="search" method="get" action="{% url 'search' %}">
+          <input
+            type="text"
+            name="q"
+            placeholder="Search something…"
+            value="{{ q|default:'' }}"
+            autofocus
+            aria-label="Search"
+          />
+          <button type="submit">Search</button>
+        </form>
+        <p class="hint">Enter a title and company</p>
+      </div>
+    </div>
+
+    {% if error %}
+      <div class="results">
+        <p class="result-title">Oops</p>
+        <p class="error">{{ error }}</p>
+      </div>
+    {% elif results %}
+      <div class="results">
+        <p class="result-title">{{ results.summary }}</p>
+        <p class="result-sub">Query: <strong>{{ q }}</strong></p>
+        {% if results.items %}
+          <div style="text-align:right; margin-top:8px;">
+        <a
+        href="{% url 'download_csv' %}?q={{ q|urlencode }}"
+        class="pill"
+        style="text-decoration:none; font-weight:600;"
+        >Download CSV</a>
+    </div>
+        <div class="results-list">
+            {% for item in results.items %}
+            <article class="result-item">
+                <h3 class="item-title">
+                {% if item.link %}
+                    <a href="{{ item.link }}" target="_blank" rel="noopener noreferrer">
+                    {% firstof item.title item.text "Untitled result" %}
+                    </a>
+                {% else %}
+                    {% firstof item.title item.text "Untitled result" %}
+                {% endif %}
+                </h3>
+                {% if item.subtitle %}
+                <p class="item-sub">{{ item.subtitle }}</p>
+                {% endif %}
+                {% if item.subtitle %}
+                <p class="item-sub">{{ item.subtitle }}</p>
+                {% endif %}
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <pre>{{ results|safe }}</pre>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</body>
+</html>
