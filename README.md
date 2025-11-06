@@ -14,7 +14,7 @@ It allows users to search by **company**, **job title**, or **keyword**, and aut
 2. See the results and save to .csv
 ![See Results](./assets/2.png)
 3. View the .csv
-![View Spreadsheet](./assets/2.png)
+![View Spreadsheet](./assets/3.png)
 
 ## 🌟 Overview
 
