@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HNN Fast</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#f6f7fb; --card:#ffffff; --text:#1a1a1a; --muted:#6b7280;
+      --ring:rgba(0,0,0,.08); --shadow:0 10px 30px rgba(0,0,0,.08);
+      --radius:16px; --accent:#111827;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    .stage {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      gap: 24px;
+      transition: all .4s ease;
+    }
+    body.has-results .stage {
+      justify-content: flex-start;
+      align-items: stretch;
+      padding: 16px clamp(16px, 4vw, 48px) 80px;
+    }
+
+    .logo-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: opacity .4s ease, transform .4s ease, margin .3s ease;
+    }
+    .app-logo {
+      width: 200px;
+      height: auto;
+    }
+    /* body.has-results .logo-wrap {
+      opacity: 0;
+      transform: translateY(-25px);
+      pointer-events: none;
+      visibility: hidden;
+    } */
+
+    /* --- Generate Button --- */
+    .generate-wrap {
+      width: min(840px, 92vw);
+      margin-inline: auto;
+      text-align: center;
+    }
+    button.generate-btn {
+      padding: 16px 28px;
+      font-weight: 600;
+      font-size: 16px;
+      border: 0;
+      border-radius: 12px;
+      cursor: pointer;
+      background: var(--accent);
+      color: white;
+      box-shadow: var(--shadow);
+      transition: background .2s ease, transform .1s ease;
+    }
+    button.generate-btn:hover {
+      background: #1f2937;
+      transform: translateY(-1px);
+    }
+
+    /* --- Results --- */
+    .results {
+      width: min(980px, 92vw);
+      margin: 22px auto 0;
+      background: var(--card);
+      border: 1px solid var(--ring);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px 28px;
+      animation: floatIn .25s ease both;
+      line-height: 1.65;
+    }
+    @keyframes floatIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .results h1, .results h2, .results h3, .results h4 {
+      margin-top: 1em;
+      margin-bottom: .5em;
+      font-weight: 600;
+      color: var(--accent);
+    }
+    .results p {
+      margin: .3em 0 .6em;
+    }
+    .results ul, .results ol {
+      padding-left: 1.3rem;
+      margin: .4em 0 .8em;
+    }
+    .results a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .results a:hover {
+      text-decoration: underline;
+    }
+    .results strong {
+      font-weight: 700;
+    }
+    .error {
+      color: #b91c1c;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body class="{% if results_html or error %}has-results{% endif %}">
+  {% load static %}
+  <div class="stage">
+
+    <!-- Logo -->
+    <div class="logo-wrap">
+      <img src="{% static 'HNN_Fast/logo.png' %}" alt="HNN Fast logo" class="app-logo">
+    </div>
+
+    <!-- Generate Newsletter Button -->
+    <div class="generate-wrap">
+      <form method="get" action="{% url 'search' %}">
+        <button type="submit" class="generate-btn">📰 Generate Newsletter</button>
+      </form>
+    </div>
+
+    <!-- Results / Errors -->
+    {% if error %}
+      <div class="results">
+        <p class="error">{{ error }}</p>
+      </div>
+    {% elif results_html %}
+      <div class="results">
+        {{ results_html|safe }}
+      </div>
+    {% endif %}
+
+  </div>
+</body>
+</html>
