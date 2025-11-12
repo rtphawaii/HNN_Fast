@@ -74,7 +74,7 @@ client = OpenAI(
 def query_llm(prompt_text: str) -> str:
     prompt = (
         "Write a business and accounting focused newsletter in markdown format "
-        "with emojis and links that summarizes all of the articles:\n\n"
+        "with emojis and links that summarizes all of the articles, filter to the local and honolulu city news:\n\n"
     )
     try:
         completion = client.chat.completions.create(
