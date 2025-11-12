@@ -10,7 +10,10 @@ Every morning, **HNN Fast**:
 1. 🧠 Pulls the newest articles directly from [hawaiinewsnow.com](https://www.hawaiinewsnow.com) using **SERP API**.  
 2. 🗞️ Summarizes all stories into a **business & accounting–focused** newsletter using **OpenRouter’s LLMs** (e.g. Gemini or DeepSeek).  
 3. 💾 Saves the newsletter into a lightweight local **SQLite database (`news_archive.db`)** for quick caching and reuse.  
-4. 🌐 Serves the results through a **Django web interface**, deployable on [Render.com](https://render.com).  
+4. 🌐 Serves the results through a **Django web interface**, deployable on [Render.com](https://render.com).
+
+Here is a look at 11/11/2025:
+![https://i.imgur.com/xGhPnFq.png](https://i.imgur.com/xGhPnFq.png)
 
 ---
 
